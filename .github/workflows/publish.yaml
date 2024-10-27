@@ -20,7 +20,7 @@ jobs:
         run: bun install --no-update
       - name: Build
         run: |
-          bun build
+          bun run build
           cat package.json | jq ".version = \"$(echo "${{ github.ref_name }}" | sed 's/^v//')"\" > package.json
       - name: Publish
         run: |
