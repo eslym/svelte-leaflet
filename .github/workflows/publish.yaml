@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: |
           bun run build
-          cat package.json | jq ".version = \"$(echo "${{ github.ref_name }}" | sed 's/^v//')"\" > package.json
+          cat package.json | jq ".version = \"$(echo "${{ github.ref_name }}" | sed 's/^v//')\"" > package.json
       - name: Publish
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
