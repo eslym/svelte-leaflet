@@ -7,9 +7,9 @@
 		syncHandler,
 		setOptions,
 		noop,
-
-		destroy
-
+		destroy,
+		latlngExp,
+		coordsEqual
 	} from './utils.js';
 	import { BROWSER } from 'esm-env';
 	import { initContext, kGroup, kMap } from './context.js';
@@ -55,13 +55,15 @@
 				});
 				setupEvent(L, map, () => restProps, {
 					move() {
-						const { lat, lng } = map!.getCenter();
-						if (lat !== center[0] || lng !== center[1]) {
-							center = [lat, lng];
+						const current = latlngExp(map.getCenter());
+						if (!coordsEqual(current, center)) {
+							center = current;
 						}
 					},
 					zoomend() {
-						zoom = map!.getZoom();
+						if (zoom !== map.getZoom()) {
+							zoom = map.getZoom();
+						}
 					}
 				});
 				oninit?.(map, L);
@@ -73,8 +75,8 @@
 					syncHandler(map.doubleClickZoom, doubleClickZoom);
 					syncHandler(map.touchZoom, touchZoom);
 					syncHandler(map.scrollWheelZoom, scrollWheelZoom);
-					const { lat, lng } = map.getCenter();
-					if (lat !== center[0] || lng !== center[1] || map.getZoom() !== zoom) {
+					const current = latlngExp(map.getCenter());
+					if (!coordsEqual(current, center) || map.getZoom() !== zoom) {
 						map.setView(center, zoom);
 					}
 					setOptions(map!, L.Map, {

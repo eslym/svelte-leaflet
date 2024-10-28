@@ -3,7 +3,15 @@
 	import type { BaseProps } from './types.js';
 	import { BROWSER } from 'esm-env';
 	import { kLayer, resolveContext } from './context.js';
-	import { destroy, extractOptions, importLeaflet, noop, setOptions } from './utils.js';
+	import {
+		coordsEqual,
+		destroy,
+		extractOptions,
+		importLeaflet,
+		latlngExp,
+		noop,
+		setOptions
+	} from './utils.js';
 
 	interface $$Props extends BaseProps<L.Tooltip>, Omit<L.TooltipOptions, 'content' | 'className'> {
 		class?: string;
@@ -50,7 +58,11 @@
 					if (el) el.className = className ?? '';
 					if (latlng) {
 						const prev = tooltip.getLatLng();
-						if (prev && (prev.lat !== latlng[0] || prev.lng !== latlng[1])) {
+						if (prev) {
+							if (!coordsEqual(latlngExp(prev), latlng)) {
+								tooltip.setLatLng(latlng);
+							}
+						} else {
 							tooltip.setLatLng(latlng);
 						}
 					}

@@ -147,3 +147,28 @@ export function destroy(target?: L.Evented & { remove: () => void }) {
 	target.clearAllEventListeners();
 	target.remove();
 }
+
+export function coordsEqual(a: (number | number[])[], b: (number | number[])[]) {
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) {
+		if (Array.isArray(a[i]) && Array.isArray(b[i])) {
+			if (!coordsEqual(a[i] as number[], b[i] as number[])) return false;
+		} else if (a[i] !== b[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+export function latlngExp(latlng: L.LatLng) {
+	return [latlng.lat, latlng.lng] as [number, number];
+}
+
+export function boundsExp(bounds: L.LatLngBounds) {
+	const sw = bounds.getNorthEast();
+	const ne = bounds.getNorthEast();
+	return [
+		[sw.lat, sw.lng],
+		[ne.lat, ne.lng]
+	] as [[number, number], [number, number]];
+}

@@ -4,9 +4,11 @@
 	import { initContext, kGroup, kLayer, kMarker, resolveContext } from './context.js';
 	import { BROWSER } from 'esm-env';
 	import {
-	destroy,
+		coordsEqual,
+		destroy,
 		extractOptions,
 		importLeaflet,
+		latlngExp,
 		noop,
 		setOptions,
 		setupEvent,
@@ -43,8 +45,10 @@
 				});
 				setupEvent(L, marker, () => restProps, {
 					move() {
-						const current = marker.getLatLng();
-						latlng = [current.lat, current.lng];
+						const current = latlngExp(marker.getLatLng());
+						if (!coordsEqual(current, latlng)) {
+							latlng = current;
+						}
 					}
 				});
 				marker.setLatLng(latlng);
@@ -56,7 +60,7 @@
 				watch = () => {
 					syncHandler(marker!.dragging, draggable);
 					const prev = marker.getLatLng();
-					if (prev.lat !== latlng[0] || prev.lng !== latlng[1]) {
+					if (!coordsEqual(latlngExp(prev), latlng)) {
 						marker.setLatLng(latlng);
 					}
 					marker.setOpacity(opacity === undefined ? L.Marker.prototype.options.opacity! : opacity);

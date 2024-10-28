@@ -4,14 +4,14 @@
 	import { BROWSER } from 'esm-env';
 	import { onMount } from 'svelte';
 
-	interface $$Props extends BaseProps<L.ImageOverlay>, L.ImageOverlayOptions {
-		url: string;
+	interface $$Props extends BaseProps<L.SVGOverlay>, Omit<L.ImageOverlayOptions, 'alt'> {
+		viewbox: string;
 		bounds: [[number, number], [number, number]];
 	}
 
 	let {
 		children = undefined,
-		url,
+		viewbox,
 		bounds,
 		instance = $bindable(undefined as any),
 		oninit = undefined,
@@ -20,14 +20,16 @@
 	}: $$Props = $props();
 
 	let watch = noop;
+	let svg: SVGElement = $state(undefined as any);
 
-	$effect(() => watch(url, bounds, zIndex, restProps));
+	$effect(() => watch(bounds, zIndex, restProps));
 
 	if (BROWSER) {
 		onMount(() => {
-			let overlay: L.ImageOverlay = undefined as any;
+			svg.remove();
+			let overlay: L.SVGOverlay = undefined as any;
 			import('leaflet').then(({ default: L }) => {
-				overlay = new L.ImageOverlay(url, bounds, {
+				overlay = new L.SVGOverlay(svg, bounds, {
 					zIndex,
 					...restProps
 				});
@@ -36,15 +38,11 @@
 				instance = overlay;
 
 				watch = () => {
-					if ((overlay as any)._url !== url) {
-						overlay.setUrl(url);
-					}
 					const b = overlay.getBounds();
 					if (!coordsEqual(boundsExp(b), bounds)) {
 						const newBounds = new L.LatLngBounds(bounds);
 						overlay.setBounds(newBounds);
 					}
-					overlay.setZIndex(zIndex ?? 1);
 					overlay.setZIndex(zIndex ?? 1);
 				};
 			});
@@ -52,3 +50,9 @@
 		});
 	}
 </script>
+
+{#if BROWSER}
+	<svg bind:this={svg} xmlns="http://www.w3.org/2000/svg" viewBox={viewbox}>
+		{@render children?.(instance)}
+	</svg>
+{/if}
