@@ -40,6 +40,7 @@
 		onMount(() => {
 			div.remove();
 			let popup: L.Popup = undefined as any;
+			let parent: L.Layer = undefined as any;
 			importLeaflet((L) => {
 				popup = new L.Popup({
 					...extractOptions(restProps),
@@ -50,7 +51,10 @@
 					popup.setLatLng(latlng);
 				}
 				oninit?.(popup, L);
-				onParent?.((p) => p.bindPopup(popup));
+				onParent?.((p) => {
+					parent = p;
+					p.bindPopup(popup);
+				});
 				instance = popup;
 
 				watch = () => {
@@ -73,7 +77,9 @@
 					});
 				};
 			});
-			return () => destroy(popup);
+			return () => destroy(popup, () => {
+				parent?.unbindPopup();
+			});
 		});
 	}
 </script>

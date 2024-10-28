@@ -40,6 +40,7 @@
 		onMount(() => {
 			div.remove();
 			let tooltip: L.Tooltip = undefined as any;
+			let parent: L.Layer = undefined as any;
 			importLeaflet((L) => {
 				tooltip = new L.Tooltip({
 					...extractOptions(restProps),
@@ -73,7 +74,7 @@
 					});
 				};
 			});
-			return () => destroy(tooltip);
+			return () => destroy(tooltip, () => parent?.unbindTooltip());
 		});
 	}
 </script>

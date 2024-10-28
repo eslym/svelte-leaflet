@@ -19,18 +19,18 @@ export const withResolvers =
 	'withResolvers' in Promise
 		? Promise.withResolvers.bind(Promise)
 		: <T>() => {
-				let resolve: (value: any) => void = undefined as any;
-				let reject: (reason: any) => void = undefined as any;
-				const promise = new Promise((res, rej) => {
-					resolve = res;
-					reject = rej;
-				});
-				return {
-					promise,
-					resolve,
-					reject
-				} as PromiseWithResolvers<T>;
-			};
+			let resolve: (value: any) => void = undefined as any;
+			let reject: (reason: any) => void = undefined as any;
+			const promise = new Promise((res, rej) => {
+				resolve = res;
+				reject = rej;
+			});
+			return {
+				promise,
+				resolve,
+				reject
+			} as PromiseWithResolvers<T>;
+		};
 
 export function importLeaflet(callback: (L: typeof import('leaflet')) => void) {
 	if (leafletPromise) {
@@ -140,12 +140,12 @@ export function setOptions(
 	target.options = opts;
 }
 
-export const noop: (...args: any[]) => any = () => {};
+export const noop: (...args: any[]) => any = () => { };
 
-export function destroy(target?: L.Evented & { remove: () => void }) {
+export function destroy<T extends L.Evented & { remove: () => void }>(target?: T, cleanup?: (target: T) => void) {
 	if (!target) return;
-	target.clearAllEventListeners();
 	target.remove();
+	cleanup?.(target);
 }
 
 export function coordsEqual(a: (number | number[])[], b: (number | number[])[]) {
