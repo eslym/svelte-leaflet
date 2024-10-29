@@ -50,7 +50,7 @@
 				if (latlng) {
 					popup.setLatLng(latlng);
 				}
-				oninit?.(popup, L);
+				oninit?.call(popup, popup, L);
 				onParent?.((p) => {
 					parent = p;
 					p.bindPopup(popup);

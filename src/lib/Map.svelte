@@ -66,7 +66,7 @@
 						}
 					}
 				});
-				oninit?.(map, L);
+				oninit?.call(map, map, L);
 				resolveMap(map);
 				instance = map;
 

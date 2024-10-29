@@ -35,7 +35,7 @@
 					zIndex
 				});
 				setupEvent(L, layer, () => restProps);
-				oninit?.(layer, L);
+				oninit?.call(layer, layer, L);
 				resolveLayer(layer);
 				onParent?.((p) => layer!.addTo(p));
 				instance = layer;

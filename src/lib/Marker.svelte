@@ -52,7 +52,7 @@
 					}
 				});
 				marker.setLatLng(latlng);
-				oninit?.(marker, L);
+				oninit?.call(marker, marker, L);
 				parentReady?.((p) => marker.addTo(p));
 				resolveMarker(marker);
 				instance = marker;

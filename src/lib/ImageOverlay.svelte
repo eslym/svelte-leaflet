@@ -34,7 +34,7 @@
 					...restProps
 				});
 				setupEvent(L, overlay, () => restProps);
-				oninit?.(overlay, L);
+				oninit?.call(overlay, overlay, L);
 				parentReady?.((p) => overlay.addTo(p));
 				instance = overlay;
 

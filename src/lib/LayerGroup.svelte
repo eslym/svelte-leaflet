@@ -23,7 +23,7 @@
 			importLeaflet((L) => {
 				group = new L.LayerGroup([], extractOptions(restProps));
 				setupEvent(L, group, () => restProps);
-				oninit?.(group, L);
+				oninit?.call(group, group, L);
 				resolveGroup(group);
 				onParent?.((p) => group!.addTo(p));
 				instance = group;

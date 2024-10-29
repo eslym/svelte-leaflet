@@ -50,7 +50,7 @@
 				if (latlng) {
 					tooltip.setLatLng(latlng);
 				}
-				oninit?.(tooltip, L);
+				oninit?.call(tooltip, tooltip, L);
 				onParent?.((p) => p.bindTooltip(tooltip));
 				instance = tooltip;
 
