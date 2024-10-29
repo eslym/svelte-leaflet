@@ -3,6 +3,7 @@
 	import { boundsExp, coordsEqual, destroy, noop, setupEvent } from '$lib/utils.js';
 	import { BROWSER } from 'esm-env';
 	import { onMount } from 'svelte';
+	import { kGroup, resolveContext } from './context.js';
 
 	interface $$Props extends BaseProps<L.SVGOverlay>, Omit<L.ImageOverlayOptions, 'alt'> {
 		viewbox: string;
@@ -22,6 +23,8 @@
 	let watch = noop;
 	let svg: SVGElement = $state(undefined as any);
 
+	const parentReady = resolveContext(kGroup, false);
+
 	$effect(() => watch(bounds, zIndex, restProps));
 
 	if (BROWSER) {
@@ -35,6 +38,7 @@
 				});
 				setupEvent(L, overlay, () => restProps);
 				oninit?.(overlay, L);
+				parentReady?.((p) => overlay.addTo(p));
 				instance = overlay;
 
 				watch = () => {

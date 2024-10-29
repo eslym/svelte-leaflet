@@ -77,9 +77,10 @@
 					});
 				};
 			});
-			return () => destroy(popup, () => {
-				parent?.unbindPopup();
-			});
+			return () =>
+				destroy(popup, () => {
+					parent?.unbindPopup();
+				});
 		});
 	}
 </script>
