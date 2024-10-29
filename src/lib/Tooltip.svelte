@@ -5,23 +5,27 @@
 	import { kLayer, resolveContext } from './context.js';
 	import {
 		coordsEqual,
-		destroy,
 		extractOptions,
 		importLeaflet,
 		latlngExp,
 		noop,
-		setOptions
+		setOptions,
+		useCleanup
 	} from './utils.js';
-	import { createTooltipHelper } from './bind-helper.js';
+	import { useTooltipHelper } from './bind-helper.js';
 
-	interface $$Props extends BaseProps<L.Tooltip>, Omit<L.TooltipOptions, 'content' | 'className'> {
+	interface $$Props
+		extends BaseProps<L.Tooltip, L.Layer>,
+			Omit<L.TooltipOptions, 'content' | 'className'> {
 		class?: string;
 		latlng?: [number, number];
 		content?: string;
 	}
 
+	const { onCleanup, cleanup } = useCleanup();
 	const onParent = resolveContext(kLayer, false);
-	const helper = createTooltipHelper();
+	const helper = useTooltipHelper();
+	onCleanup(helper.unbind);
 
 	let {
 		children = undefined,
@@ -29,6 +33,7 @@
 		class: className = undefined,
 		instance = $bindable(undefined as any),
 		oninit = undefined,
+		onparentresolved = undefined,
 		latlng = undefined,
 		...restProps
 	}: $$Props = $props();
@@ -41,41 +46,44 @@
 	if (BROWSER) {
 		onMount(() => {
 			div.remove();
-			let tooltip: L.Tooltip = undefined as any;
 			importLeaflet((L) => {
-				tooltip = new L.Tooltip({
+				const popup = new L.Tooltip({
 					...extractOptions(restProps),
 					className,
 					content: div
 				});
 				if (latlng) {
-					tooltip.setLatLng(latlng);
+					popup.setLatLng(latlng);
 				}
-				instance = tooltip;
-				oninit?.call(tooltip, tooltip, L);
-				onParent?.((p) => helper.bind(p, tooltip));
+				instance = popup;
+				onCleanup(popup.remove.bind(popup));
+				onCleanup(oninit?.call(popup, popup, L));
+				onParent?.((p) => {
+					helper.bind(p, popup);
+					onparentresolved?.call(popup, popup, L);
+				});
 
 				watch = () => {
-					const el = tooltip.getElement();
+					const el = popup.getElement();
 					if (el) el.className = className ?? '';
 					if (latlng) {
-						const prev = tooltip.getLatLng();
+						const prev = popup.getLatLng();
 						if (prev) {
 							if (!coordsEqual(latlngExp(prev), latlng)) {
-								tooltip.setLatLng(latlng);
+								popup.setLatLng(latlng);
 							}
 						} else {
-							tooltip.setLatLng(latlng);
+							popup.setLatLng(latlng);
 						}
 					}
-					setOptions(tooltip, L.Tooltip, {
+					setOptions(popup, L.Tooltip, {
 						...extractOptions(restProps),
 						className,
 						content: div
 					});
 				};
 			});
-			return () => destroy(tooltip, () => helper.unbind());
+			return cleanup;
 		});
 	}
 </script>

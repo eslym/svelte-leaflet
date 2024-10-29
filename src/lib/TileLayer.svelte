@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { BROWSER } from 'esm-env';
-	import { destroy, extractOptions, importLeaflet, noop, setOptions, setupEvent } from './utils.js';
+	import {
+		extractOptions,
+		importLeaflet,
+		noop,
+		setOptions,
+		setupEvent,
+		useCleanup
+	} from './utils.js';
 	import { onMount } from 'svelte';
 	import { initContext, kGroup, kLayer, resolveContext } from './context.js';
 	import type { BaseProps } from './types.js';
@@ -9,6 +16,7 @@
 		url: string;
 	}
 
+	const { onCleanup, cleanup } = useCleanup();
 	const onParent = resolveContext(kGroup, false);
 	const resolveLayer = initContext<L.TileLayer>(kLayer);
 
@@ -18,6 +26,7 @@
 		opacity = undefined,
 		zIndex = undefined,
 		oninit = undefined,
+		onparentresolved = undefined,
 		...restProps
 	}: $$Props = $props();
 
@@ -27,18 +36,21 @@
 
 	if (BROWSER) {
 		onMount(() => {
-			let layer: L.TileLayer = undefined as any;
 			importLeaflet((L) => {
-				layer = new L.TileLayer(url, {
+				const layer = new L.TileLayer(url, {
 					...extractOptions(restProps),
 					opacity,
 					zIndex
 				});
 				setupEvent(L, layer, () => restProps);
 				instance = layer;
-				oninit?.call(layer, layer, L);
+				onCleanup(layer.remove.bind(layer));
+				onCleanup(oninit?.call(layer, layer, L));
 				resolveLayer(layer);
-				onParent?.((p) => layer!.addTo(p));
+				onParent?.((p) => {
+					layer.addTo(p);
+					onCleanup(onparentresolved?.call(layer, p, L));
+				});
 
 				watch = () => {
 					if (url !== (layer as any)._url) {
@@ -56,7 +68,7 @@
 					});
 				};
 			});
-			return () => destroy(layer);
+			return cleanup;
 		});
 	}
 </script>

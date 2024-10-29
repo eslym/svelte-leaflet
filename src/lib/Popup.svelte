@@ -5,23 +5,27 @@
 	import { kLayer, resolveContext } from './context.js';
 	import {
 		coordsEqual,
-		destroy,
 		extractOptions,
 		importLeaflet,
 		latlngExp,
 		noop,
-		setOptions
+		setOptions,
+		useCleanup
 	} from './utils.js';
-	import { createPopupHelper } from './bind-helper.js';
+	import { usePopupHelper } from './bind-helper.js';
 
-	interface $$Props extends BaseProps<L.Popup>, Omit<L.PopupOptions, 'content' | 'className'> {
+	interface $$Props
+		extends BaseProps<L.Popup, L.Layer>,
+			Omit<L.PopupOptions, 'content' | 'className'> {
 		class?: string;
 		latlng?: [number, number];
 		content?: string;
 	}
 
+	const { onCleanup, cleanup } = useCleanup();
 	const onParent = resolveContext(kLayer, false);
-	const helper = createPopupHelper();
+	const helper = usePopupHelper();
+	onCleanup(helper.unbind);
 
 	let {
 		children = undefined,
@@ -29,6 +33,7 @@
 		class: className = undefined,
 		instance = $bindable(undefined as any),
 		oninit = undefined,
+		onparentresolved = undefined,
 		latlng = undefined,
 		...restProps
 	}: $$Props = $props();
@@ -41,9 +46,8 @@
 	if (BROWSER) {
 		onMount(() => {
 			div.remove();
-			let popup: L.Popup = undefined as any;
 			importLeaflet((L) => {
-				popup = new L.Popup({
+				const popup = new L.Popup({
 					...extractOptions(restProps),
 					className,
 					content: div
@@ -52,8 +56,12 @@
 					popup.setLatLng(latlng);
 				}
 				instance = popup;
-				oninit?.call(popup, popup, L);
-				onParent?.((p) => helper.bind(p, popup));
+				onCleanup(popup.remove.bind(popup));
+				onCleanup(oninit?.call(popup, popup, L));
+				onParent?.((p) => {
+					helper.bind(p, popup);
+					onparentresolved?.call(popup, popup, L);
+				});
 
 				watch = () => {
 					const el = popup.getElement();
@@ -75,7 +83,7 @@
 					});
 				};
 			});
-			return () => destroy(popup, () => helper.unbind());
+			return cleanup;
 		});
 	}
 </script>

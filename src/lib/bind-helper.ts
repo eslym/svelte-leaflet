@@ -6,7 +6,7 @@ const map = new WeakMap<
 	}
 >();
 
-export function createPopupHelper() {
+export function usePopupHelper() {
 	let _popup = null as L.Popup | null;
 	let _parent: L.Layer | null = null;
 	function bind(parent: L.Layer, popup: L.Popup) {
@@ -39,7 +39,7 @@ export function createPopupHelper() {
 	return { bind, unbind };
 }
 
-export function createTooltipHelper() {
+export function useTooltipHelper() {
 	let tooltip = null as L.Tooltip | null;
 	let parent: L.Layer | null = null;
 	function bind(parent: L.Layer, tooltip: L.Tooltip) {

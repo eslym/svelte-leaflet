@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { BaseProps } from '$lib/types.js';
-	import { boundsExp, coordsEqual, destroy, noop, setupEvent } from '$lib/utils.js';
+	import { boundsExp, coordsEqual, noop, setupEvent, useCleanup } from '$lib/utils.js';
 	import { BROWSER } from 'esm-env';
 	import { onMount } from 'svelte';
 	import { kGroup, resolveContext } from './context.js';
 
-	interface $$Props extends BaseProps<L.ImageOverlay>, L.ImageOverlayOptions {
+	interface $$Props extends BaseProps<L.ImageOverlay, L.LayerGroup | L.Map>, L.ImageOverlayOptions {
 		url: string;
 		bounds: [[number, number], [number, number]];
 	}
@@ -16,27 +16,32 @@
 		bounds,
 		instance = $bindable(undefined as any),
 		oninit = undefined,
+		onparentresolved = undefined,
 		zIndex = undefined,
 		...restProps
 	}: $$Props = $props();
 
 	const parentReady = resolveContext(kGroup, false);
+	const { onCleanup, cleanup } = useCleanup();
 	let watch = noop;
 
 	$effect(() => watch(url, bounds, zIndex, restProps));
 
 	if (BROWSER) {
 		onMount(() => {
-			let overlay: L.ImageOverlay = undefined as any;
 			import('leaflet').then(({ default: L }) => {
-				overlay = new L.ImageOverlay(url, bounds, {
+				const overlay = new L.ImageOverlay(url, bounds, {
 					zIndex,
 					...restProps
 				});
 				setupEvent(L, overlay, () => restProps);
 				instance = overlay;
-				oninit?.call(overlay, overlay, L);
-				parentReady?.((p) => overlay.addTo(p));
+				onCleanup(overlay.remove.bind(overlay));
+				onCleanup(oninit?.call(overlay, overlay, L));
+				parentReady?.((p) => {
+					overlay.addTo(p);
+					onCleanup(onparentresolved?.call(overlay, p, L));
+				});
 
 				watch = () => {
 					if ((overlay as any)._url !== url) {
@@ -51,7 +56,7 @@
 					overlay.setZIndex(zIndex ?? 1);
 				};
 			});
-			return () => destroy(overlay);
+			return cleanup;
 		});
 	}
 </script>

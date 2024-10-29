@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { BaseProps } from '$lib/types.js';
-	import { boundsExp, coordsEqual, destroy, noop, setupEvent } from '$lib/utils.js';
+	import { boundsExp, coordsEqual, noop, setupEvent, useCleanup } from '$lib/utils.js';
 	import { BROWSER } from 'esm-env';
 	import { onMount } from 'svelte';
 	import { kGroup, resolveContext } from './context.js';
 
-	interface $$Props extends BaseProps<L.SVGOverlay>, Omit<L.ImageOverlayOptions, 'alt'> {
+	interface $$Props
+		extends BaseProps<L.SVGOverlay, L.Map | L.LayerGroup>,
+			Omit<L.ImageOverlayOptions, 'alt'> {
 		viewbox: string;
 		bounds: [[number, number], [number, number]];
 	}
@@ -16,6 +18,7 @@
 		bounds,
 		instance = $bindable(undefined as any),
 		oninit = undefined,
+		onparentresolved = undefined,
 		zIndex = undefined,
 		...restProps
 	}: $$Props = $props();
@@ -23,6 +26,7 @@
 	let watch = noop;
 	let svg: SVGElement = $state(undefined as any);
 
+	const { onCleanup, cleanup } = useCleanup();
 	const parentReady = resolveContext(kGroup, false);
 
 	$effect(() => watch(bounds, zIndex, restProps));
@@ -30,16 +34,19 @@
 	if (BROWSER) {
 		onMount(() => {
 			svg.remove();
-			let overlay: L.SVGOverlay = undefined as any;
 			import('leaflet').then(({ default: L }) => {
-				overlay = new L.SVGOverlay(svg, bounds, {
+				const overlay = new L.SVGOverlay(svg, bounds, {
 					zIndex,
 					...restProps
 				});
 				setupEvent(L, overlay, () => restProps);
 				instance = overlay;
-				oninit?.call(overlay, overlay, L);
-				parentReady?.((p) => overlay.addTo(p));
+				onCleanup(overlay.remove.bind(overlay));
+				onCleanup(oninit?.call(overlay, overlay, L));
+				parentReady?.((p) => {
+					overlay.addTo(p);
+					onCleanup(onparentresolved?.call(overlay, p, L));
+				});
 
 				watch = () => {
 					const b = overlay.getBounds();
@@ -50,7 +57,7 @@
 					overlay.setZIndex(zIndex ?? 1);
 				};
 			});
-			return () => destroy(overlay);
+			return cleanup;
 		});
 	}
 </script>

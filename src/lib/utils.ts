@@ -142,15 +142,6 @@ export function setOptions(
 
 export const noop: (...args: any[]) => any = () => {};
 
-export function destroy<T extends L.Evented & { remove: () => void }>(
-	target?: T,
-	cleanup?: (target: T) => void
-) {
-	if (!target) return;
-	cleanup?.(target);
-	target.remove();
-}
-
 export function coordsEqual(a: (number | number[])[], b: (number | number[])[]) {
 	if (a.length !== b.length) return false;
 	for (let i = 0; i < a.length; i++) {
@@ -174,4 +165,18 @@ export function boundsExp(bounds: L.LatLngBounds) {
 		[sw.lat, sw.lng],
 		[ne.lat, ne.lng]
 	] as [[number, number], [number, number]];
+}
+
+export function useCleanup() {
+	const cleanupFns = new Set<() => void>();
+	return {
+		onCleanup(fn: any) {
+			if (typeof fn === 'function') cleanupFns.add(fn);
+		},
+		cleanup() {
+			for (const fn of cleanupFns) {
+				fn();
+			}
+		}
+	};
 }

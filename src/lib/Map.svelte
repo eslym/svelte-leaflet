@@ -7,20 +7,23 @@
 		syncHandler,
 		setOptions,
 		noop,
-		destroy,
 		latlngExp,
-		coordsEqual
+		coordsEqual,
+		useCleanup
 	} from './utils.js';
 	import { BROWSER } from 'esm-env';
 	import { initContext, kGroup, kMap } from './context.js';
 	import type { BaseProps } from './types.js';
 
-	interface $$Props extends BaseProps<L.Map>, Omit<L.MapOptions, 'center' | 'zoom'> {
+	interface $$Props
+		extends Omit<BaseProps<L.Map, never>, 'onparentresolved'>,
+			Omit<L.MapOptions, 'center' | 'zoom'> {
 		center?: [number, number] | undefined;
 		zoom?: number | undefined;
 	}
 
 	const resolveMap = initContext<L.Map>(kMap, kGroup);
+	const { onCleanup, cleanup } = useCleanup();
 
 	let div: HTMLDivElement = undefined as any;
 	let {
@@ -32,7 +35,7 @@
 		doubleClickZoom = $bindable(true),
 		touchZoom = $bindable(true),
 		scrollWheelZoom = $bindable(true),
-		oninit,
+		oninit = undefined,
 		...restProps
 	}: $$Props = $props();
 
@@ -42,9 +45,8 @@
 
 	if (BROWSER) {
 		onMount(() => {
-			let map: L.Map = undefined as any;
 			importLeaflet(async (L) => {
-				map = new L.Map(div, {
+				const map = new L.Map(div, {
 					...extractOptions(restProps),
 					center,
 					zoom,
@@ -67,7 +69,8 @@
 					}
 				});
 				instance = map;
-				oninit?.call(map, map, L);
+				onCleanup(() => map.remove());
+				onCleanup(oninit?.call(map, map, L));
 				resolveMap(map);
 
 				watch = () => {
@@ -90,7 +93,7 @@
 					});
 				};
 			});
-			return () => destroy(map);
+			return cleanup;
 		});
 	}
 </script>

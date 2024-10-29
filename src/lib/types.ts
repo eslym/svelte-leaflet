@@ -14,8 +14,9 @@ export type EventProps<T extends Record<string, (...args: any[]) => any>, C> = {
 	) => void;
 };
 
-export type BaseProps<T> = {
+export type BaseProps<T, P = any> = {
 	children?: Snippet<[T]>;
 	instance?: T;
-	oninit?: (this: T, instance: T, L: typeof import('leaflet')) => void;
+	oninit?: (this: T, instance: T, L: typeof import('leaflet')) => void | (() => void);
+	onparentresolved?: (this: T, parent: P, L: typeof import('leaflet')) => void | (() => void);
 } & EventProps<PrefixWith<L.LeafletEventHandlerFnMap, 'on'>, T>;

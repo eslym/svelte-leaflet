@@ -2,40 +2,46 @@
 	import { BROWSER } from 'esm-env';
 	import { onMount } from 'svelte';
 	import { kMap, resolveContext } from './context.js';
-	import { importLeaflet, noop } from './utils.js';
+	import { importLeaflet, noop, useCleanup } from './utils.js';
 	import type { BaseProps } from './types.js';
 
-	interface $$Props extends BaseProps<L.Control>, L.ControlOptions {}
+	interface $$Props extends BaseProps<L.Control, L.Map>, L.ControlOptions {}
 
 	let {
 		children,
 		instance = $bindable(undefined as any),
 		position = $bindable('topright'),
-		oninit
+		oninit,
+		onparentresolved
 	}: $$Props = $props();
 	let div: HTMLDivElement = $state(undefined as any);
 	let watch = noop;
 
 	const onMap = resolveContext(kMap, false);
 
+	const { onCleanup, cleanup } = useCleanup();
+
 	$effect(() => watch(position));
 
 	if (BROWSER) {
 		onMount(() => {
 			div.remove();
-			let control: L.Control = undefined as any;
 			importLeaflet((L) => {
-				control = new L.Control({ position });
+				const control = new L.Control({ position });
 				control.onAdd = () => div;
 				instance = control;
-				oninit?.call(control, control, L);
-				onMap?.((map) => control?.addTo(map));
+				onCleanup(control.remove.bind(control));
+				onCleanup(oninit?.call(control, control, L));
+				onMap?.((map) => {
+					control.addTo(map);
+					onCleanup(onparentresolved?.call(control, map, L));
+				});
 
 				watch = () => {
 					control.setPosition(position);
 				};
 			});
-			return () => control?.remove();
+			return cleanup;
 		});
 	}
 </script>

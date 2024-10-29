@@ -5,17 +5,19 @@
 	import { BROWSER } from 'esm-env';
 	import {
 		coordsEqual,
-		destroy,
 		extractOptions,
 		importLeaflet,
 		latlngExp,
 		noop,
 		setOptions,
 		setupEvent,
-		syncHandler
+		syncHandler,
+		useCleanup
 	} from './utils.js';
 
-	interface $$Props extends BaseProps<L.Marker>, Omit<L.MarkerOptions, 'icon'> {
+	interface $$Props
+		extends BaseProps<L.Marker, L.LayerGroup | L.Map>,
+			Omit<L.MarkerOptions, 'icon'> {
 		latlng: [number, number];
 	}
 
@@ -26,9 +28,11 @@
 		draggable = $bindable(false),
 		opacity = undefined,
 		oninit = undefined,
+		onparentresolved = undefined,
 		...restProps
 	}: $$Props = $props();
 
+	const { onCleanup, cleanup } = useCleanup();
 	const resolveMarker = initContext<L.Marker>(kMarker, kLayer);
 	const parentReady = resolveContext(kGroup, false);
 	let watch = noop;
@@ -37,9 +41,8 @@
 
 	if (BROWSER) {
 		onMount(() => {
-			let marker: L.Marker = undefined as any;
 			importLeaflet((L) => {
-				marker = new L.Marker(latlng, {
+				const marker = new L.Marker(latlng, {
 					...extractOptions(restProps),
 					draggable
 				});
@@ -53,8 +56,12 @@
 				});
 				marker.setLatLng(latlng);
 				instance = marker;
-				oninit?.call(marker, marker, L);
-				parentReady?.((p) => marker.addTo(p));
+				onCleanup(marker.remove.bind(marker));
+				onCleanup(oninit?.call(marker, marker, L));
+				parentReady?.((p) => {
+					marker.addTo(p);
+					onCleanup(onparentresolved?.call(marker, p, L));
+				});
 				resolveMarker(marker);
 
 				watch = () => {
@@ -67,7 +74,7 @@
 					setOptions(marker, L.Marker, { ...restProps, draggable });
 				};
 			});
-			return () => destroy(marker);
+			return cleanup;
 		});
 	}
 </script>
