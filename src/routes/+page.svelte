@@ -15,7 +15,6 @@
 	import iconUrl from 'leaflet/dist/images/marker-icon.png';
 	import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 	import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-	import { tick } from 'svelte';
 	import Orphan from '$lib/Orphan.svelte';
 
 	let map: L.Map = $state(undefined as any);
@@ -28,7 +27,6 @@
 				label?: string;
 				latlng: [number, number];
 				draggable: boolean;
-				contextOpen?: boolean;
 			}
 		>
 	>({
@@ -235,16 +233,17 @@
 					riseOnHover
 					ondblclick={() => map.setView(marker.latlng)}
 					onpopupclose={(ev) => {
+						// unbind the popup so we can bind different popup later
 						ev.target.unbindPopup();
 					}}
 				>
 					{#snippet children(mark)}
 						{@render icon()}
-						<Orphan>
-							<Popup
-								content={marker.label ?? `#${marker.id}`}
-								oninit={(p) => {
-									tick().then(() => {
+						{#if mark}
+							<Orphan>
+								<Popup
+									content={marker.label ?? `#${marker.id}`}
+									oninit={(p) => {
 										mark.on('click', () => {
 											mark.bindPopup(p);
 											mark.openPopup();
@@ -255,58 +254,58 @@
 												mark.openPopup();
 											}
 										});
-									});
-								}}
-							/>
-							<Popup
-								interactive
-								class="map-context-menu"
-								closeButton={false}
-								oninit={(p) => {
-									tick().then(() => {
+									}}
+								/>
+								<Popup
+									interactive
+									class="map-context-menu"
+									closeButton={false}
+									oninit={(p) => {
 										mark.on('contextmenu', () => {
 											mark.bindPopup(p);
 											mark.openPopup();
 										});
-									});
-								}}
-							>
-								{#snippet children(popup)}
-									<div>
-										<input class="label-input" placeholder="#{id}" bind:value={marker.label} />
-									</div>
-									<div class="menu" style:flex-direction="row">
-										<button
-											class="menu-item"
-											onclick={() => {
-												markers[marker.id].draggable = !marker.draggable;
-												mark.unbindPopup();
-												mark.bindPopup(popup);
-												mark.openPopup();
-											}}
-											style:flex-grow="1"
-											style:justify-content="center"
-										>
-											{#if marker.draggable}
-												{@render unlockIcon(16)}
-											{:else}
-												{@render lockIcon(16)}
-											{/if}
-										</button>
-										<button
-											class="menu-item"
-											onclick={() => {
-												delete markers[marker.id];
-											}}
-											style:flex-grow="1"
-											style:justify-content="center"
-										>
-											{@render trashIcon(16)}
-										</button>
-									</div>
-								{/snippet}
-							</Popup>
-						</Orphan>
+									}}
+								>
+									{#snippet children(popup)}
+										<div>
+											<input class="label-input" placeholder="#{id}" bind:value={marker.label} />
+										</div>
+										<div class="menu" style:flex-direction="row">
+											<button
+												class="menu-item"
+												onclick={() => {
+													markers[marker.id].draggable = !marker.draggable;
+													// rebind the popup is necessary to reset the event handler,
+													// otherwise the popup might not closed when marker moved
+													mark.unbindPopup();
+													mark.bindPopup(popup);
+													mark.openPopup();
+												}}
+												style:flex-grow="1"
+												style:justify-content="center"
+											>
+												{#if marker.draggable}
+													{@render unlockIcon(16)}
+												{:else}
+													{@render lockIcon(16)}
+												{/if}
+											</button>
+											<button
+												class="menu-item"
+												onclick={() => {
+													delete markers[marker.id];
+												}}
+												style:flex-grow="1"
+												style:justify-content="center"
+											>
+												{@render trashIcon(16)}
+											</button>
+										</div>
+									{/snippet}
+								</Popup>
+							</Orphan>
+						{/if}
 						<Tooltip content={marker.label ?? `#${id}`} />
 					{/snippet}
 				</Marker>
