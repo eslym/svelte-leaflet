@@ -27,9 +27,9 @@
 			importLeaflet((L) => {
 				control = new L.Control({ position });
 				control.onAdd = () => div;
+				instance = control;
 				oninit?.call(control, control, L);
 				onMap?.((map) => control?.addTo(map));
-				instance = control;
 
 				watch = () => {
 					control.setPosition(position);

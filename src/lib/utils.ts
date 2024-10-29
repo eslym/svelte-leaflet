@@ -147,8 +147,8 @@ export function destroy<T extends L.Evented & { remove: () => void }>(
 	cleanup?: (target: T) => void
 ) {
 	if (!target) return;
-	target.remove();
 	cleanup?.(target);
+	target.remove();
 }
 
 export function coordsEqual(a: (number | number[])[], b: (number | number[])[]) {

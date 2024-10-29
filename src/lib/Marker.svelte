@@ -52,10 +52,10 @@
 					}
 				});
 				marker.setLatLng(latlng);
+				instance = marker;
 				oninit?.call(marker, marker, L);
 				parentReady?.((p) => marker.addTo(p));
 				resolveMarker(marker);
-				instance = marker;
 
 				watch = () => {
 					syncHandler(marker!.dragging, draggable);

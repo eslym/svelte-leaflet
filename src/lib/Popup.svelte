@@ -12,6 +12,7 @@
 		noop,
 		setOptions
 	} from './utils.js';
+	import { createPopupHelper } from './bind-helper.js';
 
 	interface $$Props extends BaseProps<L.Popup>, Omit<L.PopupOptions, 'content' | 'className'> {
 		class?: string;
@@ -20,6 +21,7 @@
 	}
 
 	const onParent = resolveContext(kLayer, false);
+	const helper = createPopupHelper();
 
 	let {
 		children = undefined,
@@ -40,7 +42,6 @@
 		onMount(() => {
 			div.remove();
 			let popup: L.Popup = undefined as any;
-			let parent: L.Layer = undefined as any;
 			importLeaflet((L) => {
 				popup = new L.Popup({
 					...extractOptions(restProps),
@@ -50,12 +51,9 @@
 				if (latlng) {
 					popup.setLatLng(latlng);
 				}
-				oninit?.call(popup, popup, L);
-				onParent?.((p) => {
-					parent = p;
-					p.bindPopup(popup);
-				});
 				instance = popup;
+				oninit?.call(popup, popup, L);
+				onParent?.((p) => helper.bind(p, popup));
 
 				watch = () => {
 					const el = popup.getElement();
@@ -77,10 +75,7 @@
 					});
 				};
 			});
-			return () =>
-				destroy(popup, () => {
-					parent?.unbindPopup();
-				});
+			return () => destroy(popup, () => helper.unbind());
 		});
 	}
 </script>

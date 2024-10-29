@@ -34,9 +34,9 @@
 					...restProps
 				});
 				setupEvent(L, overlay, () => restProps);
+				instance = overlay;
 				oninit?.call(overlay, overlay, L);
 				parentReady?.((p) => overlay.addTo(p));
-				instance = overlay;
 
 				watch = () => {
 					if ((overlay as any)._url !== url) {

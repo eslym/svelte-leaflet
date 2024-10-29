@@ -35,10 +35,10 @@
 					zIndex
 				});
 				setupEvent(L, layer, () => restProps);
-				oninit?.(layer, L);
+				instance = layer;
+				oninit?.call(layer, layer, L);
 				resolveLayer(layer);
 				onParent?.((p) => layer!.addTo(p));
-				instance = layer;
 
 				watch = () => {
 					if (url !== (layer as any)._url) {

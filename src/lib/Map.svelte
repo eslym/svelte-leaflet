@@ -66,9 +66,9 @@
 						}
 					}
 				});
+				instance = map;
 				oninit?.call(map, map, L);
 				resolveMap(map);
-				instance = map;
 
 				watch = () => {
 					syncHandler(map.dragging, dragging);

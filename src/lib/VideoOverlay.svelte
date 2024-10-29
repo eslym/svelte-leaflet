@@ -37,8 +37,8 @@
 					...restProps
 				});
 				setupEvent(L, overlay, () => restProps);
-				oninit?.(overlay, L);
 				instance = overlay;
+				oninit?.call(overlay, overlay, L);
 
 				watch = () => {
 					if ((overlay as any)._url !== url) {

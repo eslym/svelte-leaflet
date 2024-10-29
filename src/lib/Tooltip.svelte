@@ -12,6 +12,7 @@
 		noop,
 		setOptions
 	} from './utils.js';
+	import { createTooltipHelper } from './bind-helper.js';
 
 	interface $$Props extends BaseProps<L.Tooltip>, Omit<L.TooltipOptions, 'content' | 'className'> {
 		class?: string;
@@ -20,6 +21,7 @@
 	}
 
 	const onParent = resolveContext(kLayer, false);
+	const helper = createTooltipHelper();
 
 	let {
 		children = undefined,
@@ -40,7 +42,6 @@
 		onMount(() => {
 			div.remove();
 			let tooltip: L.Tooltip = undefined as any;
-			let parent: L.Layer = undefined as any;
 			importLeaflet((L) => {
 				tooltip = new L.Tooltip({
 					...extractOptions(restProps),
@@ -50,9 +51,9 @@
 				if (latlng) {
 					tooltip.setLatLng(latlng);
 				}
-				oninit?.call(tooltip, tooltip, L);
-				onParent?.((p) => p.bindTooltip(tooltip));
 				instance = tooltip;
+				oninit?.call(tooltip, tooltip, L);
+				onParent?.((p) => helper.bind(p, tooltip));
 
 				watch = () => {
 					const el = tooltip.getElement();
@@ -74,7 +75,7 @@
 					});
 				};
 			});
-			return () => destroy(tooltip, () => parent?.unbindTooltip());
+			return () => destroy(tooltip, () => helper.unbind());
 		});
 	}
 </script>
