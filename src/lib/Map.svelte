@@ -69,7 +69,7 @@
 					}
 				});
 				instance = map;
-				onCleanup(() => map.remove());
+				onCleanup(map.remove.bind(map));
 				onCleanup(oninit?.call(map, map, L));
 				resolveMap(map);
 

@@ -215,6 +215,10 @@
 			contextPopup.setLatLng(ev.latlng);
 			contextPopup.openOn(map);
 		}}
+		
+		{...{
+			maxZoom: 18,
+		}}
 	>
 		<TileLayer
 			url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
