@@ -128,9 +128,7 @@
 				style:height={iconSizes[1]}
 			/>
 		{:else}
-			<div class={classNames} style:width={iconSizes[0]} style:height={iconSizes[1]}>
-				{@render children!()}
-			</div>
+			{@render children!()}
 		{/if}
 	</div>
 	<div
@@ -152,9 +150,7 @@
 					style:height={shadowSizes[1]}
 				/>
 			{:else}
-				<div class={classNames} style:width={shadowSizes[0]} style:height={shadowSizes[1]}>
-					{@render shadow!()}
-				</div>
+				{@render shadow!()}
 			{/if}
 		{/if}
 	</div>
