@@ -47,7 +47,7 @@
 	<Icon
 		icon={iconUrl}
 		{iconRetinaUrl}
-		{shadowUrl}
+		shadow={shadowUrl}
 		iconSize={[25, 41]}
 		iconAnchor={[12, 41]}
 		popupAnchor={[1, -34]}
@@ -215,9 +215,8 @@
 			contextPopup.setLatLng(ev.latlng);
 			contextPopup.openOn(map);
 		}}
-		
 		{...{
-			maxZoom: 18,
+			maxZoom: 18
 		}}
 	>
 		<TileLayer
@@ -228,6 +227,35 @@
 			attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
 		/>
 		<LayerGroup>
+			<Marker latlng={[3.157764, 101.711861]} riseOnHover>
+				<Icon popupAnchor={[0, -12]}>
+					{#snippet shadow()}
+						<div class="marker shadow">KLCC</div>
+					{/snippet}
+					<div class="marker">KLCC</div>
+				</Icon>
+				<Popup minWidth={350}>
+					<div
+						style:display="flex"
+						style:flex-direction="row"
+						style:gap="0.5rem"
+						style:justify-content="start"
+						style:align-items="center"
+					>
+						<img
+							src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Petronas_Twin_Towers._View_from_KL_Tower._2019-11-30_20-50-32.jpg/240px-Petronas_Twin_Towers._View_from_KL_Tower._2019-11-30_20-50-32.jpg"
+							alt="KLCC"
+							style:width="120px"
+							style:height="auto"
+						/>
+						<p style:flex-grow="1" style:text-align="justify">
+							<strong>Kuala Lumpur City Centre (KLCC)</strong> is a multipurpose development area in
+							Kuala Lumpur, Malaysia. KLCC refers to the area within and surrounding the KLCC Park but
+							the term has also been widely used by buildings nearby to the vicinity.
+						</p>
+					</div>
+				</Popup>
+			</Marker>
 			{#each Object.keys(markers) as id (id)}
 				{@const marker = markers[id as any]}
 				<Marker
@@ -345,6 +373,19 @@
 	:global(html, body) {
 		margin: 0;
 		padding: 0;
+	}
+
+	div.marker {
+		background-color: #007bff;
+		color: white;
+		border-radius: 0.25rem;
+		padding: 0.25rem 0.5rem;
+	}
+
+	div.marker.shadow {
+		color: transparent;
+		background-color: rgba(0, 0, 0, 0.5);
+		box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
 	}
 
 	div.container :global(.map-context-menu) {

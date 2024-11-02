@@ -6,10 +6,32 @@ let leafletPromise: typeof import('leaflet') | null = null;
 const pending: Set<(L: typeof import('leaflet')) => void> = new Set();
 
 if (BROWSER) {
-	import('leaflet').then((mod) => {
-		leafletPromise = mod;
+	import('leaflet').then((L) => {
+		leafletPromise = L;
+
+		const SvelteIcon = L.Icon.extend({
+			_icon: undefined as any as HTMLElement,
+			_shadow: undefined as any as HTMLElement,
+
+			initialize(options: L.BaseIconOptions) {
+				L.Util.setOptions(this, options);
+			},
+
+			createIcon() {
+				return this._icon;
+			},
+
+			createShadow() {
+				return this._shadow;
+			}
+		});
+
+		(L as any).__svelteIcon = SvelteIcon;
+
+		(L.default as any).__svelteIcon = SvelteIcon;
+
 		for (const callback of pending) {
-			callback(mod);
+			callback(L);
 		}
 		pending.clear();
 	});
@@ -176,6 +198,50 @@ export function useCleanup() {
 		cleanup() {
 			for (const fn of cleanupFns) {
 				fn();
+			}
+		}
+	};
+}
+
+const callbacks = new Map<
+	HTMLElement,
+	Set<(el: HTMLElement, width: number, height: number) => void>
+>();
+
+const observer = BROWSER
+	? new ResizeObserver(() => {
+			for (const [el, fns] of callbacks) {
+				const { width, height } = el.getBoundingClientRect();
+				for (const fn of fns) {
+					fn(el, width, height);
+				}
+			}
+		})
+	: undefined;
+
+export function onresize<E extends HTMLElement>(
+	el: E,
+	callback: (el: E, width: number, height: number) => void
+) {
+	if (!observer) return;
+	if (!callbacks.has(el)) {
+		callbacks.set(el, new Set());
+		observer.observe(el);
+	}
+	callbacks.get(el)!.add(callback as any);
+
+	const { width, height } = el.getBoundingClientRect();
+	callback(el, width, height);
+
+	return {
+		destroy() {
+			const fns = callbacks.get(el);
+			if (fns) {
+				fns.delete(callback as any);
+				if (!fns.size) {
+					callbacks.delete(el);
+					observer.unobserve(el);
+				}
 			}
 		}
 	};
