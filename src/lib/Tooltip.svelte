@@ -14,13 +14,20 @@
 	} from './utils.js';
 	import { useTooltipHelper } from './bind-helper.js';
 
-	interface $$Props
-		extends BaseProps<L.Tooltip, L.Layer>,
-			Omit<L.TooltipOptions, 'content' | 'className'> {
-		class?: string;
-		latlng?: [number, number];
-		content?: string;
-	}
+	type $$Props = Omit<BaseProps<L.Tooltip, L.Layer>, 'children'> &
+		Omit<L.TooltipOptions, 'content' | 'className'> & {
+			class?: string;
+			latlng?: [number, number];
+		} & (
+			| {
+					children: (popup: L.Tooltip) => any;
+					content?: never;
+			  }
+			| {
+					children?: never;
+					content: string;
+			  }
+		);
 
 	const { onCleanup, cleanup } = useCleanup();
 	const onParent = resolveContext(kLayer, false);

@@ -14,13 +14,20 @@
 	} from './utils.js';
 	import { usePopupHelper } from './bind-helper.js';
 
-	interface $$Props
-		extends BaseProps<L.Popup, L.Layer>,
-			Omit<L.PopupOptions, 'content' | 'className'> {
-		class?: string;
-		latlng?: [number, number];
-		content?: string;
-	}
+	type $$Props = Omit<BaseProps<L.Popup, L.Layer>, 'children'> &
+		Omit<L.PopupOptions, 'content' | 'className'> & {
+			class?: string;
+			latlng?: [number, number];
+		} & (
+			| {
+					children: (popup: L.Popup) => any;
+					content?: never;
+			  }
+			| {
+					children?: never;
+					content: string;
+			  }
+		);
 
 	const { onCleanup, cleanup } = useCleanup();
 	const onParent = resolveContext(kLayer, false);
