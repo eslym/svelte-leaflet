@@ -64,7 +64,6 @@
 	let shadowUrl = $derived((retina ? shadowRetinaUrl : (shadow as string)) ?? (shadow as string));
 
 	let iconDivSize: [number, number] = $state([0, 0]);
-	let shadowDivSize: [number, number] = $state([0, 0]);
 
 	let _is = $derived(Array.isArray(iconSize) ? iconSize : [iconSize, iconSize]);
 	let _ss = $derived(Array.isArray(shadowSize) ? shadowSize : [shadowSize, shadowSize]);
@@ -77,8 +76,8 @@
 		typeof shadowSize !== 'undefined' ? (_ss as [number, number]) : _iconSize
 	);
 
-	let iconSizes = $derived(_is.map((s) => (typeof s === 'number' ? px(s) : 'fit-content')));
-	let shadowSizes = $derived(_ss.map((s) => (typeof s === 'number' ? px(s) : 'fit-content')));
+	let iconSizes = $derived(_is.map((s) => (typeof s === 'number' ? px(s) : undefined)));
+	let shadowSizes = $derived(_ss.map((s) => (typeof s === 'number' ? px(s) : undefined)));
 
 	let iconMargins = $derived(calculateMargins(_iconSize, iconAnchor));
 	let shadowMargins = $derived(calculateMargins(_shadowSize, shadowAnchor ?? iconAnchor));
@@ -125,10 +124,10 @@
 
 {#if BROWSER}
 	<div
-		class="leaflet-marker-icon"
+		class="leaflet-marker-icon { typeof icon !== 'string' ? classNames : '' }"
 		bind:this={iconDiv}
-		style:width={iconSizes[0]}
-		style:height={iconSizes[1]}
+		style:width={iconSizes[0] ?? 'fit-content'}
+		style:height={iconSizes[1] ?? 'fit-content'}
 		style:margin-left={iconMargins[0]}
 		style:margin-top={iconMargins[1]}
 		use:onresize={(_, w, h) => (iconDivSize = [w, h])}
@@ -147,13 +146,12 @@
 		{/if}
 	</div>
 	<div
-		class="leaflet-marker-shadow"
+		class="leaflet-marker-shadow { typeof icon !== 'string' ? classNames : '' }"
 		bind:this={shadowDiv}
-		style:width={shadowSizes[0]}
-		style:height={shadowSizes[1]}
+		style:width={shadowSizes[0] ?? 'fit-content'}
+		style:height={shadowSizes[1] ?? 'fit-content'}
 		style:margin-left={shadowMargins[0]}
 		style:margin-top={shadowMargins[1]}
-		use:onresize={(_, w, h) => (shadowDivSize = [w, h])}
 	>
 		{#if shadow}
 			{#if typeof shadow === 'string'}
