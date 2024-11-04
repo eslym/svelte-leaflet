@@ -42,9 +42,30 @@
 	if (BROWSER) {
 		onMount(() => {
 			importLeaflet((L) => {
+				let icon: any = undefined;
+				const baseOpt = Object.setPrototypeOf(
+					{
+						get draggable() {
+							return draggable;
+						},
+						set draggable(value: boolean) {
+							draggable = value;
+						},
+						get icon() {
+							return icon;
+						},
+						set icon(value: any) {
+							icon = value;
+						}
+					},
+					L.Marker.prototype.options
+				);
 				const marker = new L.Marker(latlng, {
 					...extractOptions(restProps),
 					draggable
+				});
+				setOptions(marker, baseOpt, {
+					...restProps
 				});
 				setupEvent(L, marker, () => restProps, {
 					move() {
@@ -71,7 +92,9 @@
 						marker.setLatLng(latlng);
 					}
 					marker.setOpacity(opacity === undefined ? L.Marker.prototype.options.opacity! : opacity);
-					setOptions(marker, L.Marker, { ...restProps, draggable });
+					setOptions(marker, baseOpt, {
+						...restProps
+					});
 				};
 			});
 			return cleanup;

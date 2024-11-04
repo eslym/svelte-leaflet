@@ -29,11 +29,11 @@
 					shadowRetinaUrl?: never;
 			  }
 		) & {
-			iconSize?: [number, number];
+			iconSize?: [number, number] | number;
 			iconAnchor?: [number, number];
 			popupAnchor?: [number, number];
 			tooltipAnchor?: [number, number];
-			shadowSize?: [number, number];
+			shadowSize?: [number, number] | number;
 			shadowAnchor?: [number, number];
 			class?: string;
 		};
@@ -63,16 +63,25 @@
 	let iconUrl = $derived((retina ? iconRetinaUrl : icon) ?? icon!);
 	let shadowUrl = $derived((retina ? shadowRetinaUrl : (shadow as string)) ?? (shadow as string));
 
-	let iconSizes = $derived(iconSize?.map(px) ?? ['', '']);
-	let shadowSizes = $derived(shadowSize?.map(px) ?? ['', '']);
-
 	let iconDivSize: [number, number] = $state([0, 0]);
 	let shadowDivSize: [number, number] = $state([0, 0]);
 
-	let iconMargins = $derived(calculateMargins(iconSize ?? iconDivSize, iconAnchor));
-	let shadowMargins = $derived(
-		calculateMargins(shadowSize ?? iconSize ?? shadowDivSize, shadowAnchor ?? iconAnchor)
+	let _is = $derived(Array.isArray(iconSize) ? iconSize : [iconSize, iconSize]);
+	let _ss = $derived(Array.isArray(shadowSize) ? shadowSize : [shadowSize, shadowSize]);
+
+	let _iconSize = $derived(
+		typeof iconSize !== 'undefined' ? (_is as [number, number]) : iconDivSize
 	);
+
+	let _shadowSize = $derived(
+		typeof shadowSize !== 'undefined' ? (_ss as [number, number]) : _iconSize
+	);
+
+	let iconSizes = $derived(_is.map((s) => (typeof s === 'number' ? px(s) : 'fit-content')));
+	let shadowSizes = $derived(_ss.map((s) => (typeof s === 'number' ? px(s) : 'fit-content')));
+
+	let iconMargins = $derived(calculateMargins(_iconSize, iconAnchor));
+	let shadowMargins = $derived(calculateMargins(_shadowSize, shadowAnchor ?? iconAnchor));
 
 	function px(v: number) {
 		return `${v}px`;
@@ -97,7 +106,13 @@
 			shadowDiv.remove();
 			importLeaflet((L) => {
 				retina = L.Browser.retina;
-				const i: L.Icon = new (L as any).__svelteIcon(options) as L.Icon;
+				const i: L.Icon = new (L as any).__svelteIcon(() => ({
+					...options,
+					iconSize,
+					iconAnchor,
+					shadowSize,
+					shadowAnchor
+				})) as L.Icon;
 				(i as any)._icon = iconDiv;
 				(i as any)._shadow = shadowDiv;
 				markerReady?.((marker) => {

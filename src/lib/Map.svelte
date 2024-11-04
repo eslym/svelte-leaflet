@@ -82,7 +82,7 @@
 					if (!coordsEqual(current, center) || map.getZoom() !== zoom) {
 						map.setView(center, zoom);
 					}
-					setOptions(map!, L.Map, {
+					setOptions(map!, L.Map.prototype.options, {
 						...extractOptions(restProps),
 						center,
 						zoom,

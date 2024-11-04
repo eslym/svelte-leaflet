@@ -61,7 +61,7 @@
 						opacity === undefined ? L.TileLayer.prototype.options.opacity! : opacity
 					);
 					layer.setZIndex(zIndex === undefined ? L.TileLayer.prototype.options.zIndex! : zIndex);
-					setOptions(layer, L.TileLayer, {
+					setOptions(layer, L.TileLayer.prototype.options, {
 						...extractOptions(restProps),
 						opacity,
 						zIndex

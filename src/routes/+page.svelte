@@ -227,7 +227,7 @@
 			attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
 		/>
 		<LayerGroup>
-			<Marker latlng={[3.157764, 101.711861]} riseOnHover>
+			<Marker latlng={[3.157764, 101.711861]} riseOnHover draggable>
 				<Icon popupAnchor={[0, -12]}>
 					{#snippet shadow()}
 						<div class="marker shadow">KLCC</div>
@@ -375,11 +375,17 @@
 		padding: 0;
 	}
 
+	:global(body) {
+		font-family: 'Twemoji', sans-serif;
+	}
+
 	div.marker {
 		background-color: #007bff;
 		color: white;
 		border-radius: 0.25rem;
 		padding: 0.25rem 0.5rem;
+		width: max-content;
+		min-width: max-content;
 	}
 
 	div.marker.shadow {

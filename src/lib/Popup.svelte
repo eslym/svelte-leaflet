@@ -83,7 +83,7 @@
 							popup.setLatLng(latlng);
 						}
 					}
-					setOptions(popup, L.Popup, {
+					setOptions(popup, L.Popup.prototype.options, {
 						...extractOptions(restProps),
 						className,
 						content: div
