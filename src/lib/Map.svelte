@@ -51,7 +51,7 @@
 				const baseOpts = Object.setPrototypeOf(
 					{
 						get crs() {
-							return typeof crs === 'string' ? L.CRS[crs] : L.Map.prototype.options.crs;
+							return typeof crs === 'string' ? L.CRS[crs] : (crs ?? L.Map.prototype.options.crs);
 						},
 						set crs(value) {
 							crs = value;
