@@ -54,39 +54,39 @@
 		onMount(() => {
 			div.remove();
 			importLeaflet((L) => {
-				const popup = new L.Tooltip({
+				const tooltip = new L.Tooltip({
 					...extractOptions(restProps),
 					className,
 					content: div
 				});
 				if (latlng) {
-					popup.setLatLng(latlng);
+					tooltip.setLatLng(latlng);
 				}
-				instance = popup;
-				onCleanup(popup.remove.bind(popup));
-				onCleanup(oninit?.call(popup, popup, L));
+				instance = tooltip;
+				onCleanup(tooltip.remove.bind(tooltip));
+				onCleanup(oninit?.call(tooltip, tooltip, L));
 				onParent?.((p) => {
-					helper.bind(p, popup);
-					onparentresolved?.call(popup, popup, L);
+					helper.bind(p, tooltip);
+					onparentresolved?.call(tooltip, tooltip, L);
 				});
 
 				watch = () => {
-					const el = popup.getElement();
+					const el = tooltip.getElement();
 					if (el) el.className = className ?? '';
 					if (latlng) {
-						const prev = popup.getLatLng();
+						const prev = tooltip.getLatLng();
 						if (prev) {
 							if (!coordsEqual(latlngExp(prev), latlng)) {
-								popup.setLatLng(latlng);
+								tooltip.setLatLng(latlng);
 							}
 						} else {
-							popup.setLatLng(latlng);
+							tooltip.setLatLng(latlng);
 						}
 					}
-					setOptions(popup, L.Tooltip.prototype.options, {
+					setOptions(tooltip, L.Tooltip.prototype.options, {
 						...extractOptions(restProps),
 						className,
-						content: div
+						content: div,
 					});
 				};
 			});

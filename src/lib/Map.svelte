@@ -17,9 +17,10 @@
 
 	interface $$Props
 		extends Omit<BaseProps<L.Map, never>, 'onparentresolved'>,
-			Omit<L.MapOptions, 'center' | 'zoom'> {
+			Omit<L.MapOptions, 'center' | 'zoom' | 'crs'> {
 		center?: [number, number] | undefined;
 		zoom?: number | undefined;
+		crs?: L.CRS | keyof typeof import('leaflet').CRS | undefined;
 	}
 
 	const resolveMap = initContext<L.Map>(kMap, kGroup);
@@ -28,6 +29,7 @@
 	let div: HTMLDivElement = undefined as any;
 	let {
 		children = undefined,
+		crs = undefined,
 		instance = $bindable(undefined as any),
 		center = $bindable([0, 0]),
 		zoom = $bindable(0),
@@ -41,12 +43,33 @@
 
 	let watch = noop;
 
-	$effect(() => watch(center, zoom, dragging, doubleClickZoom, touchZoom, scrollWheelZoom));
+	$effect(() => watch(center, crs, zoom, dragging, doubleClickZoom, touchZoom, scrollWheelZoom));
 
 	if (BROWSER) {
 		onMount(() => {
 			importLeaflet(async (L) => {
+				const baseOpts = Object.setPrototypeOf(
+					{
+						get crs() {
+							return typeof crs === 'string' ? L.CRS[crs] : L.Map.prototype.options.crs;
+						},
+						set crs(value) {
+							crs = value;
+						}
+					},
+					L.Map.prototype.options
+				);
 				const map = new L.Map(div, {
+					...extractOptions(restProps),
+					crs: baseOpts.crs,
+					center,
+					zoom,
+					dragging,
+					doubleClickZoom,
+					touchZoom,
+					scrollWheelZoom
+				});
+				setOptions(map, baseOpts, {
 					...extractOptions(restProps),
 					center,
 					zoom,
@@ -82,7 +105,7 @@
 					if (!coordsEqual(current, center) || map.getZoom() !== zoom) {
 						map.setView(center, zoom);
 					}
-					setOptions(map!, L.Map.prototype.options, {
+					setOptions(map!, baseOpts, {
 						...extractOptions(restProps),
 						center,
 						zoom,
