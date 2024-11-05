@@ -18,6 +18,7 @@
 	interface $$Props
 		extends Omit<BaseProps<L.Map, never>, 'onparentresolved'>,
 			Omit<L.MapOptions, 'center' | 'zoom' | 'crs'> {
+		class?: string;
 		center?: [number, number] | undefined;
 		zoom?: number | undefined;
 		crs?: L.CRS | keyof typeof import('leaflet').CRS | undefined;
@@ -29,6 +30,7 @@
 	let div: HTMLDivElement = undefined as any;
 	let {
 		children = undefined,
+		class: classNames = undefined,
 		crs = undefined,
 		instance = $bindable(undefined as any),
 		center = $bindable([0, 0]),
@@ -121,7 +123,7 @@
 	}
 </script>
 
-<div bind:this={div}>
+<div bind:this={div} class={classNames}>
 	{#if BROWSER}
 		{@render children?.(instance)}
 	{/if}
