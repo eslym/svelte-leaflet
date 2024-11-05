@@ -20,7 +20,7 @@ if (BROWSER) {
 						const opt = options();
 						Object.setPrototypeOf(opt, L.Icon.prototype.options);
 						return opt;
-					},
+					}
 				});
 			},
 
@@ -48,18 +48,18 @@ export const withResolvers =
 	'withResolvers' in Promise
 		? Promise.withResolvers.bind(Promise)
 		: <T>() => {
-			let resolve: (value: any) => void = undefined as any;
-			let reject: (reason: any) => void = undefined as any;
-			const promise = new Promise((res, rej) => {
-				resolve = res;
-				reject = rej;
-			});
-			return {
-				promise,
-				resolve,
-				reject
-			} as PromiseWithResolvers<T>;
-		};
+				let resolve: (value: any) => void = undefined as any;
+				let reject: (reason: any) => void = undefined as any;
+				const promise = new Promise((res, rej) => {
+					resolve = res;
+					reject = rej;
+				});
+				return {
+					promise,
+					resolve,
+					reject
+				} as PromiseWithResolvers<T>;
+			};
 
 export function importLeaflet(callback: (L: typeof import('leaflet')) => void) {
 	if (leafletPromise) {
@@ -159,17 +159,13 @@ export function syncHandler(handler: L.Handler | undefined, state: boolean | str
 	handler?.[state ? 'enable' : 'disable']();
 }
 
-export function setOptions(
-	target: { options: any },
-	base: any,
-	options: any
-) {
+export function setOptions(target: { options: any }, base: any, options: any) {
 	const opts = { ...options };
 	Object.setPrototypeOf(opts, base);
 	target.options = opts;
 }
 
-export const noop: (...args: any[]) => any = () => { };
+export const noop: (...args: any[]) => any = () => {};
 
 export function coordsEqual(a: (number | number[])[], b: (number | number[])[]) {
 	if (a.length !== b.length) return false;
@@ -217,13 +213,13 @@ const callbacks = new Map<
 
 const observer = BROWSER
 	? new ResizeObserver(() => {
-		for (const [el, fns] of callbacks) {
-			const { width, height } = el.getBoundingClientRect();
-			for (const fn of fns) {
-				fn(el, width, height);
+			for (const [el, fns] of callbacks) {
+				const { width, height } = el.getBoundingClientRect();
+				for (const fn of fns) {
+					fn(el, width, height);
+				}
 			}
-		}
-	})
+		})
 	: undefined;
 
 export function onresize<E extends HTMLElement>(

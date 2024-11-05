@@ -25,7 +25,7 @@
 					shadowRetinaUrl?: string;
 			  }
 			| {
-					shadow: Snippet;
+					shadow: Snippet<[iconSize: [width: number, height: number]]>;
 					shadowRetinaUrl?: never;
 			  }
 		) & {
@@ -124,7 +124,7 @@
 
 {#if BROWSER}
 	<div
-		class="leaflet-marker-icon { typeof icon !== 'string' ? classNames : '' }"
+		class="leaflet-marker-icon {typeof icon !== 'string' ? classNames : ''}"
 		bind:this={iconDiv}
 		style:width={iconSizes[0] ?? 'fit-content'}
 		style:height={iconSizes[1] ?? 'fit-content'}
@@ -146,7 +146,7 @@
 		{/if}
 	</div>
 	<div
-		class="leaflet-marker-shadow { typeof icon !== 'string' ? classNames : '' }"
+		class="leaflet-marker-shadow {typeof icon !== 'string' ? classNames : ''}"
 		bind:this={shadowDiv}
 		style:width={shadowSizes[0] ?? 'fit-content'}
 		style:height={shadowSizes[1] ?? 'fit-content'}
@@ -163,7 +163,7 @@
 					style:height={shadowSizes[1]}
 				/>
 			{:else}
-				{@render shadow!()}
+				{@render shadow!(iconDivSize)}
 			{/if}
 		{/if}
 	</div>

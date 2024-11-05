@@ -227,10 +227,10 @@
 			attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
 		/>
 		<LayerGroup>
-			<Marker latlng={[3.157764, 101.711861]} riseOnHover draggable>
+			<Marker latlng={[3.157764, 101.711861]} riseOnHover>
 				<Icon popupAnchor={[0, -12]}>
-					{#snippet shadow()}
-						<div class="marker shadow">KLCC</div>
+					{#snippet shadow([width, height])}
+						<div class="marker shadow" style:width="{width}px" style:height="{height}px"></div>
 					{/snippet}
 					<div class="marker">KLCC</div>
 				</Icon>
@@ -390,6 +390,7 @@
 
 	div.marker.shadow {
 		color: transparent;
+		box-sizing: border-box;
 		background-color: rgba(0, 0, 0, 0.5);
 		box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
 	}
