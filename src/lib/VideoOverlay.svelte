@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { BaseProps } from '$lib/types.js';
-	import { destroy, noop, setupEvent } from '$lib/utils.js';
+	import { noop, setupEvent, useCleanup } from '$lib/utils.js';
 	import { BROWSER } from 'esm-env';
 	import { onMount } from 'svelte';
+	import { kGroup, resolveContext } from './context.js';
 
 	interface $$Props extends BaseProps<L.VideoOverlay>, L.VideoOverlayOptions {
 		url: string;
@@ -15,6 +16,7 @@
 		bounds,
 		instance = $bindable(undefined as any),
 		oninit = undefined,
+		onparentresolved = undefined,
 		zIndex = undefined,
 		autoplay = true,
 		loop = true,
@@ -24,6 +26,8 @@
 		...restProps
 	}: $$Props = $props();
 
+	const { cleanup, onCleanup } = useCleanup();
+	const onParentResolved = resolveContext(kGroup, false);
 	let watch = noop;
 
 	$effect(() => watch(url, bounds, zIndex, restProps));
@@ -38,7 +42,11 @@
 				});
 				setupEvent(L, overlay, () => restProps);
 				instance = overlay;
-				oninit?.call(overlay, overlay, L);
+				onCleanup(oninit?.call(overlay, overlay, L));
+				onParentResolved?.((p) => {
+					overlay.addTo(p);
+					onCleanup(onparentresolved?.call(overlay, overlay, L));
+				});
 
 				watch = () => {
 					if ((overlay as any)._url !== url) {
@@ -66,8 +74,10 @@
 						el.style.objectFit = keepAspectRatio ? 'contain' : 'fill';
 					}
 				};
+
+				onCleanup(overlay.remove.bind(overlay));
 			});
-			return () => destroy(overlay);
+			return cleanup;
 		});
 	}
 </script>
