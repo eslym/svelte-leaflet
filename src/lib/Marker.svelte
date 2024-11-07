@@ -52,7 +52,7 @@
 							draggable = value;
 						},
 						get icon() {
-							return icon;
+							return icon ?? L.Marker.prototype.options.icon;
 						},
 						set icon(value: any) {
 							icon = value;
