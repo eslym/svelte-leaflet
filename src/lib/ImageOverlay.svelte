@@ -22,7 +22,7 @@
 	}: $$Props = $props();
 
 	const parentReady = resolveContext(kGroup, false);
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	let watch = noop;
 
 	$effect(() => watch(url, bounds, zIndex, restProps));
@@ -56,7 +56,6 @@
 					overlay.setZIndex(zIndex ?? 1);
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

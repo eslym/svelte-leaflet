@@ -25,7 +25,7 @@
 	}
 
 	const resolveMap = initContext<L.Map>(kMap, kGroup);
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 
 	let div: HTMLDivElement = undefined as any;
 	let {
@@ -118,7 +118,6 @@
 					});
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

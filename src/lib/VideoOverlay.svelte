@@ -26,7 +26,7 @@
 		...restProps
 	}: $$Props = $props();
 
-	const { cleanup, onCleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const onParentResolved = resolveContext(kGroup, false);
 	let watch = noop;
 
@@ -77,7 +77,6 @@
 
 				onCleanup(overlay.remove.bind(overlay));
 			});
-			return cleanup;
 		});
 	}
 </script>

@@ -29,7 +29,7 @@
 			  }
 		);
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const onParent = resolveContext(kLayer, false);
 	const helper = useTooltipHelper();
 	onCleanup(helper.unbind);
@@ -86,11 +86,10 @@
 					setOptions(tooltip, L.Tooltip.prototype.options, {
 						...extractOptions(restProps),
 						className,
-						content: div,
+						content: div
 					});
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

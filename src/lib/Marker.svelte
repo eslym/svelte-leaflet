@@ -32,7 +32,7 @@
 		...restProps
 	}: $$Props = $props();
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const resolveMarker = initContext<L.Marker>(kMarker, kLayer);
 	const parentReady = resolveContext(kGroup, false);
 	let watch = noop;
@@ -97,7 +97,6 @@
 					});
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

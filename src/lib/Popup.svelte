@@ -29,7 +29,7 @@
 			  }
 		);
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const onParent = resolveContext(kLayer, false);
 	const helper = usePopupHelper();
 	onCleanup(helper.unbind);
@@ -90,7 +90,6 @@
 					});
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

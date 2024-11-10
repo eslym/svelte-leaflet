@@ -19,7 +19,7 @@
 
 	const onMap = resolveContext(kMap, false);
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 
 	$effect(() => watch(position));
 
@@ -41,7 +41,6 @@
 					control.setPosition(position);
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

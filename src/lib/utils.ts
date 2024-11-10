@@ -1,6 +1,7 @@
 import { BROWSER } from 'esm-env';
 import type { LeafletEventHandlerFnMap } from 'leaflet';
 import type { BaseProps } from './types.js';
+import { onDestroy } from 'svelte';
 
 let leafletPromise: typeof import('leaflet') | null = null;
 const pending: Set<(L: typeof import('leaflet')) => void> = new Set();
@@ -194,15 +195,13 @@ export function boundsExp(bounds: L.LatLngBounds) {
 
 export function useCleanup() {
 	const cleanupFns = new Set<() => void>();
-	return {
-		onCleanup(fn: any) {
-			if (typeof fn === 'function') cleanupFns.add(fn);
-		},
-		cleanup() {
-			for (const fn of cleanupFns) {
-				fn();
-			}
+	onDestroy(() => {
+		for (const fn of cleanupFns) {
+			fn();
 		}
+	});
+	return (fn: any) => {
+		if (typeof fn === 'function') cleanupFns.add(fn);
 	};
 }
 

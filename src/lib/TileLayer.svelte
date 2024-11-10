@@ -16,7 +16,7 @@
 		url: string;
 	}
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const onParent = resolveContext(kGroup, false);
 	const resolveLayer = initContext<L.TileLayer>(kLayer);
 
@@ -68,7 +68,6 @@
 					});
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

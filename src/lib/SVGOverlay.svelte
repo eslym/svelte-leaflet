@@ -26,7 +26,7 @@
 	let watch = noop;
 	let svg: SVGElement = $state(undefined as any);
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const parentReady = resolveContext(kGroup, false);
 
 	$effect(() => watch(bounds, zIndex, restProps));
@@ -57,7 +57,6 @@
 					overlay.setZIndex(zIndex ?? 1);
 				};
 			});
-			return cleanup;
 		});
 	}
 </script>

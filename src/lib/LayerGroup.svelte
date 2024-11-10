@@ -7,7 +7,7 @@
 
 	interface $$Props extends BaseProps<L.LayerGroup, L.LayerGroup | L.Map>, L.LayerOptions {}
 
-	const { onCleanup, cleanup } = useCleanup();
+	const onCleanup = useCleanup();
 	const onParent = resolveContext(kGroup, false);
 	const resolveGroup = initContext<L.LayerGroup>(kGroup);
 
@@ -33,7 +33,6 @@
 					onCleanup(onparentresolved?.call(group, p, L));
 				});
 			});
-			return cleanup;
 		});
 	}
 </script>
