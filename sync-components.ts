@@ -5,7 +5,7 @@ const glob = new Bun.Glob('src/lib/*.svelte');
 
 const pkgJson = await Bun.file('package.json').json();
 
-const components: string[] = [...glob.scanSync('.')].map((f) => basename(f, '.svelte'));
+const components: string[] = [...glob.scanSync('.')].map((f) => basename(f, '.svelte')).sort();
 
 pkgJson.exports = {
 	'.': {
@@ -23,8 +23,6 @@ for (const name of components) {
 
 await Bun.write('package.json', JSON.stringify(pkgJson, null, 2));
 await Bun.$`bunx prettier --write package.json`;
-
-components.sort();
 
 const indexTs = `
 ${components.map((n) => `import ${n} from './${n}.svelte';`).join('\n')}

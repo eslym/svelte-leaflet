@@ -32,57 +32,57 @@
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
 		},
-		"./Tooltip.svelte": {
-			"types": "./dist/Tooltip.svelte.d.ts",
-			"svelte": "./dist/Tooltip.svelte"
-		},
-		"./TileLayer.svelte": {
-			"types": "./dist/TileLayer.svelte.d.ts",
-			"svelte": "./dist/TileLayer.svelte"
-		},
-		"./Popup.svelte": {
-			"types": "./dist/Popup.svelte.d.ts",
-			"svelte": "./dist/Popup.svelte"
-		},
-		"./VideoOverlay.svelte": {
-			"types": "./dist/VideoOverlay.svelte.d.ts",
-			"svelte": "./dist/VideoOverlay.svelte"
-		},
-		"./SVGOverlay.svelte": {
-			"types": "./dist/SVGOverlay.svelte.d.ts",
-			"svelte": "./dist/SVGOverlay.svelte"
-		},
-		"./ImageOverlay.svelte": {
-			"types": "./dist/ImageOverlay.svelte.d.ts",
-			"svelte": "./dist/ImageOverlay.svelte"
-		},
-		"./Marker.svelte": {
-			"types": "./dist/Marker.svelte.d.ts",
-			"svelte": "./dist/Marker.svelte"
-		},
-		"./WMSTileLayer.svelte": {
-			"types": "./dist/WMSTileLayer.svelte.d.ts",
-			"svelte": "./dist/WMSTileLayer.svelte"
-		},
-		"./LayerGroup.svelte": {
-			"types": "./dist/LayerGroup.svelte.d.ts",
-			"svelte": "./dist/LayerGroup.svelte"
+		"./Control.svelte": {
+			"types": "./dist/Control.svelte.d.ts",
+			"svelte": "./dist/Control.svelte"
 		},
 		"./Icon.svelte": {
 			"types": "./dist/Icon.svelte.d.ts",
 			"svelte": "./dist/Icon.svelte"
 		},
-		"./Orphan.svelte": {
-			"types": "./dist/Orphan.svelte.d.ts",
-			"svelte": "./dist/Orphan.svelte"
+		"./ImageOverlay.svelte": {
+			"types": "./dist/ImageOverlay.svelte.d.ts",
+			"svelte": "./dist/ImageOverlay.svelte"
 		},
-		"./Control.svelte": {
-			"types": "./dist/Control.svelte.d.ts",
-			"svelte": "./dist/Control.svelte"
+		"./LayerGroup.svelte": {
+			"types": "./dist/LayerGroup.svelte.d.ts",
+			"svelte": "./dist/LayerGroup.svelte"
 		},
 		"./Map.svelte": {
 			"types": "./dist/Map.svelte.d.ts",
 			"svelte": "./dist/Map.svelte"
+		},
+		"./Marker.svelte": {
+			"types": "./dist/Marker.svelte.d.ts",
+			"svelte": "./dist/Marker.svelte"
+		},
+		"./Orphan.svelte": {
+			"types": "./dist/Orphan.svelte.d.ts",
+			"svelte": "./dist/Orphan.svelte"
+		},
+		"./Popup.svelte": {
+			"types": "./dist/Popup.svelte.d.ts",
+			"svelte": "./dist/Popup.svelte"
+		},
+		"./SVGOverlay.svelte": {
+			"types": "./dist/SVGOverlay.svelte.d.ts",
+			"svelte": "./dist/SVGOverlay.svelte"
+		},
+		"./TileLayer.svelte": {
+			"types": "./dist/TileLayer.svelte.d.ts",
+			"svelte": "./dist/TileLayer.svelte"
+		},
+		"./Tooltip.svelte": {
+			"types": "./dist/Tooltip.svelte.d.ts",
+			"svelte": "./dist/Tooltip.svelte"
+		},
+		"./VideoOverlay.svelte": {
+			"types": "./dist/VideoOverlay.svelte.d.ts",
+			"svelte": "./dist/VideoOverlay.svelte"
+		},
+		"./WMSTileLayer.svelte": {
+			"types": "./dist/WMSTileLayer.svelte.d.ts",
+			"svelte": "./dist/WMSTileLayer.svelte"
 		}
 	},
 	"peerDependencies": {
