@@ -2,7 +2,7 @@
 	import { onMount, type Snippet } from 'svelte';
 	import { kMarker, resolveContext } from './context.js';
 	import { BROWSER } from 'esm-env';
-	import { importLeaflet, onresize } from './utils.js';
+	import { getSvelteIconClass, importLeaflet, onresize } from './utils.js';
 	import type { HTMLImgAttributes } from 'svelte/elements';
 
 	type $$Props = (
@@ -105,11 +105,12 @@
 			shadowDiv.remove();
 			importLeaflet((L) => {
 				retina = L.Browser.retina;
-				const i: L.Icon = new (L as any).__svelteIcon(() => ({
+				const Icon = getSvelteIconClass(L);
+				const i: L.Icon = new Icon(() => ({
 					...options,
-					iconSize,
+					iconSize: _is as [number, number],
 					iconAnchor,
-					shadowSize,
+					shadowSize: _ss as [number, number],
 					shadowAnchor
 				})) as L.Icon;
 				(i as any)._icon = iconDiv;

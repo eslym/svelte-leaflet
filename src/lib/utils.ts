@@ -6,37 +6,13 @@ import { onDestroy } from 'svelte';
 let leafletPromise: typeof import('leaflet') | null = null;
 const pending: Set<(L: typeof import('leaflet')) => void> = new Set();
 
+type SvelteLeafeletIconClass = new (opt: () => L.BaseIconOptions) => L.Icon;
+
+const svelteIconClasses = new WeakMap<typeof import('leaflet'), SvelteLeafeletIconClass>();
+
 if (BROWSER) {
 	import('leaflet').then((L) => {
 		leafletPromise = L;
-
-		const SvelteIcon = L.Icon.extend({
-			_icon: undefined as any as HTMLElement,
-			_shadow: undefined as any as HTMLElement,
-
-			initialize(options: () => L.BaseIconOptions) {
-				delete this.options;
-				Object.defineProperty(this, 'options', {
-					get: () => {
-						const opt = options();
-						Object.setPrototypeOf(opt, L.Icon.prototype.options);
-						return opt;
-					}
-				});
-			},
-
-			createIcon() {
-				return this._icon;
-			},
-
-			createShadow() {
-				return this._shadow;
-			}
-		});
-
-		(L as any).__svelteIcon = SvelteIcon;
-
-		(L.default as any).__svelteIcon = SvelteIcon;
 
 		for (const callback of pending) {
 			callback(L);
@@ -70,6 +46,37 @@ export function importLeaflet(callback: (L: typeof import('leaflet')) => void) {
 	if (BROWSER) {
 		pending.add(callback);
 	}
+}
+
+export function getSvelteIconClass(L: typeof import('leaflet')) {
+	if (svelteIconClasses.has(L)) {
+		return svelteIconClasses.get(L)!;
+	}
+	const SvelteIcon = L.Icon.extend({
+		_icon: undefined as any as HTMLElement,
+		_shadow: undefined as any as HTMLElement,
+
+		initialize(options: () => L.BaseIconOptions) {
+			delete this.options;
+			Object.defineProperty(this, 'options', {
+				get: () => {
+					const opt = options();
+					Object.setPrototypeOf(opt, L.Icon.prototype.options);
+					return opt;
+				}
+			});
+		},
+
+		createIcon() {
+			return this._icon;
+		},
+
+		createShadow() {
+			return this._shadow;
+		}
+	});
+	svelteIconClasses.set(L, SvelteIcon as any);
+	return SvelteIcon;
 }
 
 type EventStriped<T extends Record<string, any>> = {
